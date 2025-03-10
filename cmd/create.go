@@ -31,7 +31,7 @@ func HandleCreateRepo(repoName string, private bool, description string) {
 	fmt.Printf("✅ Created repository \033[31m%s\033[0m\n\n", response.Status())
 	fmt.Println("Repository: ", createdRepo.Name)
 	fmt.Println("Private: ", createdRepo.Private)
-	fmt.Println("Description: ", createdRepo.Description)
+	fmt.Println("Description: ", createdRepo.Description) 
 }
 
 // createCmd represents the create command
