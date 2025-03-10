@@ -1,40 +1,55 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
 	"fmt"
 
+	"github.com/go-resty/resty/v2"
+	"github.com/phenriqx/github-cli/cmd/helpers"
 	"github.com/spf13/cobra"
 )
 
+func HandleCreateRepo(repoName string, private bool, description string) {
+	github_token, _ := helpers.GetGithubToken()
+	var createdRepo helpers.CreateRepoRequest
+	payload := helpers.CreateRepoRequest{
+		Name:    repoName,
+		Private: private,
+		Description: description,
+	}
+
+	client := resty.New()
+	response, err := client.R().
+		SetHeader("Authorization", "token "+github_token).
+		SetBody(&payload).
+		SetResult(&createdRepo).
+		Post("https://api.github.com/user/repos")
+	if err != nil {
+		fmt.Println("Error creating repository: ", err)
+		return
+	}
+
+	fmt.Printf("✅ Created repository \033[31m%s\033[0m\n\n", response.Status())
+	fmt.Println("Repository: ", createdRepo.Name)
+	fmt.Println("Private: ", createdRepo.Private)
+	fmt.Println("Description: ", createdRepo.Description)
+}
+
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Use:   "create <repo-name>",
+	Short: "Creates a new repository on Github",
+	Args:  cobra.ExactArgs(1),
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("create called")
+		repoName := args[0]
+		private, _ := cmd.Flags().GetBool("private") // Get the value of the --private flag
+		description, _ := cmd.Flags().GetString("desc") // Get the value of the --desc flag
+		HandleCreateRepo(repoName, private, description)
 	},
 }
 
 func init() {
+	createCmd.PersistentFlags().BoolP("private", "p", false, "Criar repositório como privado")
+	createCmd.PersistentFlags().String("desc", "", "Repository Description")
 	rootCmd.AddCommand(createCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// createCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// createCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

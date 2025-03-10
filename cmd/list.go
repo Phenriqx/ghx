@@ -33,6 +33,7 @@ func HandleGetRequest() {
 	fmt.Println("Repositories: ")
 	for i, repo := range repos {
 		fmt.Printf("%d 🔹 \033[1;34m%s\033[0m\n", i+1, repo.Name)
+		fmt.Printf("   💻 Main Language: %s\n", repo.Language)
 		fmt.Printf("   🔒 Private: %t\n", repo.Private)
 		fmt.Printf("   🔗 %s\n\n", repo.HTMLURL)
 	}
@@ -42,7 +43,7 @@ func HandleGetRequest() {
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
-	Short: "A brief description of your command",
+	Short: "List all the user repositories",
 	Long: `A longer description that spans multiple lines and likely contains examples
 	and usage of using your command. For example:
 
