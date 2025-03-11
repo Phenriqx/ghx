@@ -18,7 +18,7 @@ func HandleGetRepo(repoPath string) {
 
 	response, err := client.R().Get("https://api.github.com/repos/" + repoPath)
 	if err != nil {
-		fmt.Println("Error getting repository: ", err)
+		fmt.Println("Error getting repository: ", err)	
 		return
 	}
 	fmt.Println("https://api.github.com/repos/" + repoPath)

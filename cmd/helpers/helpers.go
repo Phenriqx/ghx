@@ -30,14 +30,14 @@ func GetContributors(repoPath string) ([]Contributors, error) {
 
 	response, err := client.R().Get(request_url)
 	if err != nil {
-		fmt.Println("Error getting contributors: ", err)
+		fmt.Println("Error handling GET request: ", err)
 		return nil, err
 	}
 
 	var contributors []Contributors
 	err = json.Unmarshal(response.Body(), &contributors)
 	if err != nil {
-		fmt.Println("Error unmarshalling response: ", err)
+		fmt.Println("This repository does not exist. Please check your URL")
 		return nil, err
 	}
 	return contributors, nil
@@ -51,10 +51,10 @@ func PrintRepoDetails(repo Repository, repoPath string) {
 
 	contributors, err := GetContributors(repoPath)
 	if err != nil {
-		fmt.Println("Error getting contributors: ", err)
+		fmt.Println("Could not get the repository's information. Please check the URL")
         return
 	} else {
-        fmt.Println("   🔒 Contributors:")
+        fmt.Println("   💡 Contributors:")
         for _, contributor := range contributors {
             contributionText := "contributions"
             if contributor.Contributions == 1 {

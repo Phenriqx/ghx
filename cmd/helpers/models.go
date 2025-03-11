@@ -4,8 +4,8 @@ type Repository struct {
 	Name string `json:"name"`
 	Private bool `json:"private"`
 	Language string `json:"language"`
+	Stars int `json:"stargazers_count"`
 	Description string `json:"description"`
-	// Contributors Contributors `json:"contributors_url"`
 	HTMLURL string `json:"html_url"`
 	CloneURL string `json:"clone_url"`
 }
