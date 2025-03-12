@@ -6,7 +6,6 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
-	// "time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/phenriqx/github-cli/cmd/helpers"
@@ -37,6 +36,10 @@ func GetUserActivity(username string) {
 		formattedDate := helpers.ParseDate(data.CreatedAt)
 		if data.Type == "PushEvent" {
 			fmt.Printf("%s pushed %d commit(s) to %s on %s\n", username, data.Payload.Size, data.Repo.Name, formattedDate)
+		} else if data.Type == "CreateEvent" {
+			fmt.Printf("%s created a new repository named %s on %s\n", username, data.Repo.Name, formattedDate)
+		} else {
+			fmt.Printf("Activity: %s, %s, %d on %s\n", data.Type, data.Repo.Name, data.Payload.Size, formattedDate)
 		}
 
 	}
