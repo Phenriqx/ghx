@@ -4,13 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/joho/godotenv"
 )
 
+func ParseDate(s string) string {
+	parsedTime, err := time.Parse(time.RFC3339, s)
+	if err != nil {
+		fmt.Println("Error parsing date: ", err)
+        return ""
+	}
+	formattedDate := parsedTime.Format("02/01")
+	return formattedDate
+}
+
 func GetGithubToken() (string, error) {
-	err := godotenv.Load()
+	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Println("Error loading .env file")
 		return "", err
@@ -45,24 +56,24 @@ func GetContributors(repoPath string) ([]Contributors, error) {
 
 func PrintRepoDetails(repo Repository, repoPath string) {
 	fmt.Printf("   🔹 Name: \033[1;34m%s\033[0m\n", repo.Name)
-    fmt.Printf("   📃 Description: \033[1;34m%s\033[0m\n", repo.Description)
-    fmt.Printf("   💻 Main Language: %s\n", repo.Language)
-    fmt.Printf("   🔒 Private: %t\n", repo.Private)
+	fmt.Printf("   📃 Description: \033[1;34m%s\033[0m\n", repo.Description)
+	fmt.Printf("   💻 Main Language: %s\n", repo.Language)
+	fmt.Printf("   🔒 Private: %t\n", repo.Private)
 
 	contributors, err := GetContributors(repoPath)
 	if err != nil {
 		fmt.Println("Could not get the repository's information. Please check the URL")
-        return
+		return
 	} else {
-        fmt.Println("   💡 Contributors:")
-        for _, contributor := range contributors {
-            contributionText := "contributions"
-            if contributor.Contributions == 1 {
-                contributionText = "contribution"
-            }
-            fmt.Printf("     🔹 \033[1;32m%s\033[0m: %d %s\n", contributor.Login, contributor.Contributions, contributionText)
-        }
-    }
-    fmt.Printf("   🔗 URL: \033[1;34m%s\033[0m\n", repo.HTMLURL)
-    fmt.Printf("   🕸️  Remote Origin: \033[1;34m%s\033[0m\n\n", repo.CloneURL)
+		fmt.Println("   💡 Contributors:")
+		for _, contributor := range contributors {
+			contributionText := "contributions"
+			if contributor.Contributions == 1 {
+				contributionText = "contribution"
+			}
+			fmt.Printf("     🔹 \033[1;32m%s\033[0m: %d %s\n", contributor.Login, contributor.Contributions, contributionText)
+		}
+	}
+	fmt.Printf("   🔗 URL: \033[1;34m%s\033[0m\n", repo.HTMLURL)
+	fmt.Printf("   🕸️  Remote Origin: \033[1;34m%s\033[0m\n\n", repo.CloneURL)
 }

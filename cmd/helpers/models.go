@@ -21,3 +21,14 @@ type CreateRepoRequest struct {
 	Private bool `json:"private"`
 	Description string `json:"description"`
 }
+
+type UserActivity struct {
+	Type string `json:"type"`
+	Repo struct {
+		Name string `json:"name"`
+	} `json:"repo"`
+	CreatedAt string `json:"created_at"`
+	Payload struct {
+		Size int `json:"size"`
+	} `json:"payload"`
+}
