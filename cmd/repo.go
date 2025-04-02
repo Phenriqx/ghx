@@ -27,7 +27,8 @@ func HandleGetRepo(repoPath string) {
 		fmt.Println("Error unmarshalling response: ", err)
 		return
 	}
-
+	
+	// fmt.Println(string(response.Body()))
 	helpers.PrintRepoDetails(repo, repoPath)
 }
 

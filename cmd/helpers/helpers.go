@@ -48,7 +48,6 @@ func GetContributors(repoPath string) ([]Contributors, error) {
 	var contributors []Contributors
 	err = json.Unmarshal(response.Body(), &contributors)
 	if err != nil {
-		fmt.Println("This repository does not exist. Please check your URL")
 		return nil, err
 	}
 	return contributors, nil
@@ -59,10 +58,13 @@ func PrintRepoDetails(repo Repository, repoPath string) {
 	fmt.Printf("   📃 Description: \033[1;34m%s\033[0m\n", repo.Description)
 	fmt.Printf("   💻 Main Language: %s\n", repo.Language)
 	fmt.Printf("   🔒 Private: %t\n", repo.Private)
+	fmt.Printf("   🔗 HTTPS URL: \033[1;34m%s\033[0m\n", repo.HTMLURL)
+	fmt.Printf("   🖇️ SSH URL: \033[1;34m%s\033[0m\n", repo.SSHURL)
+	fmt.Printf("   🕸️ Remote Origin: \033[1;34m%s\033[0m\n", repo.CloneURL)
 
-	contributors, err := GetContributors(repoPath)
-	if err != nil {
-		fmt.Println("Could not get the repository's information. Please check the URL")
+	contributors, _ := GetContributors(repoPath)
+	if len(contributors) == 0 {
+		fmt.Println("   💡 This project does not have any contributors.")
 		return
 	} else {
 		fmt.Println("   💡 Contributors:")
@@ -74,6 +76,4 @@ func PrintRepoDetails(repo Repository, repoPath string) {
 			fmt.Printf("     🔹 \033[1;32m%s\033[0m: %d %s\n", contributor.Login, contributor.Contributions, contributionText)
 		}
 	}
-	fmt.Printf("   🔗 URL: \033[1;34m%s\033[0m\n", repo.HTMLURL)
-	fmt.Printf("   🕸️  Remote Origin: \033[1;34m%s\033[0m\n\n", repo.CloneURL)
 }

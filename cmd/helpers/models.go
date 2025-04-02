@@ -7,6 +7,7 @@ type Repository struct {
 	Stars int `json:"stargazers_count"`
 	Description string `json:"description"`
 	HTMLURL string `json:"html_url"`
+	SSHURL string `json:"ssh_url"`
 	CloneURL string `json:"clone_url"`
 }
 

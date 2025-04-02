@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/phenriqx/github-cli/cmd"
+	"github.com/phenriqx/github-cli/cmd"	
 )
 
 func main() {
