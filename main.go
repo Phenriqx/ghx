@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
+	err := godotenv.Load("/usr/local/bin/.env")
 	GITHUB_TOKEN := os.Getenv("GITHUB_TOKEN")
 	if err != nil {
 		log.Println("Error loading .env file, using system environment variables")

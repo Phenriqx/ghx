@@ -21,7 +21,7 @@ func ParseDate(s string) string {
 }
 
 func GetGithubToken() (string, error) {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("/usr/local/bin/.env")
 	if err != nil {
 		fmt.Println("Error loading .env file")
 		return "", err
@@ -58,9 +58,9 @@ func PrintRepoDetails(repo Repository, repoPath string) {
 	fmt.Printf("   📃 Description: \033[1;34m%s\033[0m\n", repo.Description)
 	fmt.Printf("   💻 Main Language: %s\n", repo.Language)
 	fmt.Printf("   🔒 Private: %t\n", repo.Private)
-	fmt.Printf("   🔗 HTTPS URL: \033[1;34m%s\033[0m\n", repo.HTMLURL)
-	fmt.Printf("   🖇️ SSH URL: \033[1;34m%s\033[0m\n", repo.SSHURL)
-	fmt.Printf("   🕸️ Remote Origin: \033[1;34m%s\033[0m\n", repo.CloneURL)
+	fmt.Printf("   🔗 Github URL: \033[1;34m%s\033[0m\n", repo.HTMLURL)
+	fmt.Printf("   🖇️ Remote SSH URL: \033[1;34m%s\033[0m\n", repo.SSHURL)
+	fmt.Printf("   🕸️ Remote HTTPS Origin: \033[1;34m%s\033[0m\n", repo.CloneURL)
 
 	contributors, _ := GetContributors(repoPath)
 	if len(contributors) == 0 {
