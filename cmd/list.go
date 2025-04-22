@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cobra"
@@ -10,12 +10,13 @@ import (
 	"github.com/phenriqx/github-cli/cmd/helpers"
 )
 
-func HandleGetRequest() {
+func HandleGetRequest(username string) {
 	github_token, _ := helpers.GetGithubToken()
 	client := resty.New()
 	client.SetHeader("Authorization", "token "+github_token)
 
-	response, err := client.R().Get("https://api.github.com/user/repos")
+	request_url := fmt.Sprintf("https://api.github.com/users/%s/repos", username)
+	response, err := client.R().Get(request_url)
 	if err != nil {
 		fmt.Println("Error: ", err)
 		return
@@ -27,6 +28,7 @@ func HandleGetRequest() {
 		fmt.Println("Error unmarshalling response: ", err)
 		return
 	}
+
 	fmt.Println("Repositories: ")
 	for i, repo := range repos {
 		fmt.Printf("%d 🔹 \033[1;34m%s\033[0m\n", i+1, repo.Name)
@@ -38,12 +40,16 @@ func HandleGetRequest() {
 
 // listCmd represents the list command
 var listCmd = &cobra.Command{
-	Use:   "list",
+	Use:   "list <username>",
 	Short: "List all the user repositories",
-	
+	Long: `List all the repositories from the user. How to use:
+			github-cli {username}`,
+	Args: cobra.ExactArgs(1),
+
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Fetching Repositories...")
-		HandleGetRequest()
+		username := args[0]
+		HandleGetRequest(username)
 	},
 }
 
