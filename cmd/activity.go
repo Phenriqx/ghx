@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func GetUserActivity(username string) {
+func GetUserActivity(username string, numActivity int) {
 	github_token, _ := helpers.GetGithubToken()
 	client := resty.New()
 	client.SetHeader("Authorization", "token "+github_token)
@@ -31,8 +31,7 @@ func GetUserActivity(username string) {
 		fmt.Println("Error unmarshalling response: ", err)
 		return
 	}
-
-	for _, data := range activity[:5] {
+	for _, data := range activity[:numActivity] {
 		formattedDate := helpers.ParseDate(data.CreatedAt)
 		if data.Type == "PushEvent" {
 			fmt.Printf("%s pushed %d commit(s) to %s on %s\n", username, data.Payload.Size, data.Repo.Name, formattedDate)
@@ -49,17 +48,25 @@ func GetUserActivity(username string) {
 var activityCmd = &cobra.Command{
 	Use:   "activity <username>",
 	Short: "Get activity information from a certain user.",
-	Args:  cobra.ExactArgs(1),
+	Long: `Get recent activity from a certain user with the following syntax:
+			github-cli activity {username}
+			--number {define how many activities from the user you want to return} - optional`,
+	Args: cobra.ExactArgs(1),
 
 	Run: func(cmd *cobra.Command, args []string) {
 		username := args[0]
-		GetUserActivity(username)
+		numActivity, err := cmd.Flags().GetInt("number")
+		if err != nil {
+			fmt.Println("Error getting --number flag: ", err)
+			return
+		}
+		GetUserActivity(username, numActivity)
 	},
 }
 
 func init() {
+	activityCmd.PersistentFlags().IntP("number", "n", 5, "Define how many activities from the user you want to return.")
 	rootCmd.AddCommand(activityCmd)
-
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
