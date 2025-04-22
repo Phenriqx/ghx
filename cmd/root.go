@@ -1,6 +1,5 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
@@ -10,18 +9,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-
-
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "github-cli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Use:   "github-cli {command}",
+	Short: "Command Line Interface that allows the user to perform Github functionalities on the terminal.",
+	Long: `This CLI allows the user to perform Github operations on the terminal without needing to visit the Github Website for anything.
+Some actions include: create and delete repositories, get a certain user recent activitity, search repos, etc.
+Example: github-cli create testing-application --private --desc "Testing my Github CLI!
+This command creates a private repo with the given description on your Github account faster than you would using the website."`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -47,5 +42,3 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
-
-

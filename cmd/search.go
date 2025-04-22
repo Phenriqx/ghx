@@ -4,15 +4,15 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/phenriqx/github-cli/cmd/helpers"
 	"github.com/spf13/cobra"
 )
 
-func HandleSearchGetRequest(search string) {
+func HandleSearchGetRequest(search string, numberOfRepos int) {
 	github_token, _ := helpers.GetGithubToken()
 	client := resty.New()
 	client.SetHeader("Authorization", "token "+github_token)
@@ -34,7 +34,7 @@ func HandleSearchGetRequest(search string) {
 		return
 	}
 
-    for i, repo := range results.Items[:5] {
+	for i, repo := range results.Items[:numberOfRepos] {
 		fmt.Printf("\n%d %s (%d⭐)\n", i+1, repo.Name, repo.Stars)
 		fmt.Printf("   📜 %s\n", repo.Description)
 		fmt.Printf("   🔗 %s\n", repo.HTMLURL)
@@ -46,15 +46,24 @@ func HandleSearchGetRequest(search string) {
 var searchCmd = &cobra.Command{
 	Use:   "search <repository>",
 	Short: "Search for a repository on Github",
-	Args:  cobra.ExactArgs(1),
+	Long: `Search for a repository on Github. 
+		github-cli search {name of the repo}`,
+	Args: cobra.ExactArgs(1),
+
 	Run: func(cmd *cobra.Command, args []string) {
 		search := args[0]
+		numberOfRepos, err := cmd.Flags().GetInt("number")
+		if err != nil {
+			fmt.Println("Error getting --number flag: ", err)
+			return
+		}
 		fmt.Println("Searching for: ", search)
-		HandleSearchGetRequest(search)
+		HandleSearchGetRequest(search, numberOfRepos)
 	},
 }
 
 func init() {
+	searchCmd.PersistentFlags().IntP("number", "n", 5, "Search for a certain number of repos.")
 	rootCmd.AddCommand(searchCmd)
 
 	// Here you will define your flags and configuration settings.
