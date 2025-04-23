@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"github.com/phenriqx/github-cli/cmd/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -44,26 +45,48 @@ var initCmd = &cobra.Command{
 }
 
 func HandleInitCommand(private, ssh bool, name, desc string) {
-	cmd := exec.Command("git", "init")
-	output, err := cmd.Output()
+	githubToken, err := helpers.GetGithubToken()
 	if err != nil {
-		fmt.Println("Error running git init command: ", err)
+		fmt.Printf("Error fetching Github Token: %v\n", err)
 		return
 	}
-	fmt.Println(output)
+
+	username, err := helpers.GetGithubUsername(githubToken)
+	if err != nil {
+		fmt.Printf("Error getting username from Github: %v\n", err)
+		return
+	}
+
+	cmd := exec.Command("git", "init")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Printf("Error running git init: %v\nOutput: %s\n", err, string(output))
+		return
+	}
+
+	fmt.Println(string(output))
+
 	response, createdRepo, err := HandleCreateRepo(name, desc, private)
 	if err != nil {
 		fmt.Printf("Error creating Github Repo: %v\nStatus Code: %v\n", err, response.Status())
 		return
 	}
-	ssh_url := fmt.Sprintf("git@github.com:user/%s.git", createdRepo.Name)
-	addOrigin := exec.Command("git", "remote", "add", "origin", ssh_url)
-	originOutput, err := addOrigin.Output()
+
+	var remoteOrigin string
+	if ssh {
+		remoteOrigin = fmt.Sprintf("git@github.com:%s/%s.git", username, createdRepo.Name)
+	} else {
+		remoteOrigin = fmt.Sprintf("https://github.com/%s/%s.git", username, createdRepo.Name)
+	}
+
+	addOrigin := exec.Command("git", "remote", "add", "origin", remoteOrigin)
+	originOutput, err := addOrigin.CombinedOutput()
 	if err != nil {
-		fmt.Println("Error running git remote add origin command: ", err)
+		fmt.Printf("Error running git remote add origin command: %v\nOutput: %v\n", err, string(originOutput))
 		return
 	}
-	fmt.Println(originOutput)
+
+	fmt.Println(string(originOutput))
 }
 
 func getDirectoryName() (string, error) {

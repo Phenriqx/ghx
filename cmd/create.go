@@ -9,7 +9,10 @@ import (
 )
 
 func HandleCreateRepo(repoName, description string, private bool) (*resty.Response, helpers.CreateRepoRequest, error) {
-	github_token, _ := helpers.GetGithubToken()
+	github_token, err := helpers.GetGithubToken()
+	if err != nil || github_token == "" {
+		return nil, helpers.CreateRepoRequest{}, fmt.Errorf("Error fetching Github Token: %v", err)
+	}
 	var createdRepo helpers.CreateRepoRequest
 	payload := helpers.CreateRepoRequest{
 		Name:        repoName,
@@ -26,6 +29,10 @@ func HandleCreateRepo(repoName, description string, private bool) (*resty.Respon
 	if err != nil {
 		fmt.Println("Error creating repository: ", err)
 		return nil, helpers.CreateRepoRequest{}, err
+	}
+	if response.StatusCode() >= 400 {
+		fmt.Printf("Error. Status Code: %v", response.StatusCode())
+		return response, helpers.CreateRepoRequest{}, fmt.Errorf("Github API Error: %v", response.String())
 	}
 
 	return response, createdRepo, nil

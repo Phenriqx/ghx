@@ -14,7 +14,7 @@ func ParseDate(s string) string {
 	parsedTime, err := time.Parse(time.RFC3339, s)
 	if err != nil {
 		fmt.Println("Error parsing date: ", err)
-        return ""
+		return ""
 	}
 	formattedDate := parsedTime.Format("02/01")
 	return formattedDate
@@ -76,4 +76,22 @@ func PrintRepoDetails(repo Repository, repoPath string) {
 			fmt.Printf("     🔹 \033[1;32m%s\033[0m: %d %s\n", contributor.Login, contributor.Contributions, contributionText)
 		}
 	}
+}
+
+func GetGithubUsername(token string) (string, error) {
+	var user GithubUser
+	client := resty.New()
+
+	response, err := client.R().
+		SetHeader("Authorization", "token "+token).
+		SetResult(&user).
+		Get("https://api.github.com/user")
+	if err != nil {
+		return "", err
+	}
+	if response.StatusCode() >= 400 {
+		return "", fmt.Errorf("Github API Error: %v", response.String())
+	}
+
+	return user.Login, nil
 }
