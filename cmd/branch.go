@@ -43,6 +43,23 @@ var deleteBranchCmd = &cobra.Command{
 		}
 		if err := DeleteBranch(name); err != nil {
 			fmt.Printf("Error deleting branch: %v\n", err)
+			return
+		}
+	},
+}
+
+var switchBranchCmd = &cobra.Command{
+	Use:   "switch",
+	Short: "Switch branches",
+	Run: func(cmd *cobra.Command, args []string) {
+		name, err := cmd.Flags().GetString("name")
+		if err != nil {
+			fmt.Printf("Error getting --name flag: %v\n", err)
+			return
+		}
+		if err := SwitchBranch(name); err != nil {
+			fmt.Printf("Error switching to branch %s.\n", name)
+			return
 		}
 	},
 }
@@ -69,23 +86,26 @@ func DeleteBranch(name string) error {
 	return nil
 }
 
+func SwitchBranch(name string) error {
+	switchCmd := exec.Command("git", "checkout", name)
+	output, err := switchCmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("Error switching to branch %s.\nOutput: %v\n", name, string(output))
+	}
+
+	fmt.Printf("Switched to branch %s.\n", name)
+	return nil
+}
+
 func init() {
 	createBranchCmd.PersistentFlags().StringP("name", "n", "", "Name of the new branch")
 	deleteBranchCmd.PersistentFlags().StringP("name", "n", "", "Name of the branch to delete")
+	switchBranchCmd.PersistentFlags().StringP("name", "n", "", "Name of the branch to switch to")
 
 	// Attach subcommands to branch
 	branchCmd.AddCommand(createBranchCmd)
 	branchCmd.AddCommand(deleteBranchCmd)
+	branchCmd.AddCommand(switchBranchCmd)
 
 	rootCmd.AddCommand(branchCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// branchCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// branchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
