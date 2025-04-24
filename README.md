@@ -22,34 +22,46 @@ git clone https://github.com/yourusername/github-cli.git
 cd github-cli
 
 # Build the binary
-go build -o github-cli
+go build -o github-tool .
 
 # Move to a directory in your PATH (optional)
-sudo mv github-cli /usr/local/bin/ (linux/macOS)
+sudo mv github-tool /usr/local/bin/ (linux/macOS)
+```
+After that, you need to make your compiled binary executable by running chmod:
+
+```
+chmod +x /usr/local/bin/github-tool
+```
+
+## 🔑 Configuration
+This tool requires a GitHub personal access token for authentication. You can set up your token as an environment variable like this:
+```
+export GITHUB_TOKEN="your_personal_access_token"
+```
+
+Or you can create a .env file in the same path as your compiled code (recommended):
+
+```
+echo "GITHUB_TOKEN=your_actual_token_here" > .env
 ```
 
 ## 🏃 Usage
 Run the CLI tool with the available commands:
 
 ```
-github-cli --help
+github-tool --help
 ```
 ### 📖 Example Commands
 ```
-github-cli list
+github-tool list
 ```
 ```
-github-cli create <repo-name> --private (optional) --desc "" (optional)
+github-tool create <repo-name> --private (optional) --desc "" (optional)
 ```
 ```
-github-cli delete <repo-name>
+github-tool delete <repo-name>
 ```
 
-## 🔑 Configuration
-This tool requires a GitHub personal access token for authentication. Set up your token as an environment variable:
-```
-export GITHUB_TOKEN="your_personal_access_token"
-```
 
 ## 📦 Dependencies 
 <p>🐍 <a href="https://github.com/spf13/cobra" >Cobra</a> - CLI framework</p>
