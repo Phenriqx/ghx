@@ -75,15 +75,15 @@ func HandleInitCommand(private, ssh, gitignore, readme, push bool, name, desc st
 		remoteOrigin = fmt.Sprintf("https://github.com/%s/%s.git", username, createdRepo.Name)
 	}
 
-	if err := optionalFiles(gitignore, readme, push, createdRepo); err != nil {
-		fmt.Printf("Error creating optional file: %v\n", err)
-		return
-	}
-
 	addOrigin := exec.Command("git", "remote", "add", "origin", remoteOrigin)
 	originOutput, err := addOrigin.CombinedOutput()
 	if err != nil {
 		fmt.Printf("Error running git remote add origin command: %v\nOutput: %v\n", err, string(originOutput))
+		return
+	}
+
+	if err := optionalFiles(gitignore, readme, push, createdRepo); err != nil {
+		fmt.Printf("Error creating optional file: %v\n", err)
 		return
 	}
 
@@ -95,20 +95,17 @@ func HandleInitCommand(private, ssh, gitignore, readme, push bool, name, desc st
 func optionalFiles(gitignore, readme, push bool, createdRepo helpers.CreateRepoRequest) error {
 	if gitignore {
 		if err := createGitignoreFile(); err != nil {
-			fmt.Printf("Error creating .gitignore file: %v\n", err)
-			return err
+			return fmt.Errorf("Error creating .gitignore file: %v\n\n", err)
 		}
 	}
 	if readme {
 		if err := createReadmeFile(createdRepo.Name); err != nil {
-			fmt.Printf("Error creating README.md file: %v\n", err)
-			return err
+			return fmt.Errorf("Error creating README.md file: %v\n\n", err)
 		}
 	}
 	if push {
 		if err := autoPushInitialCommit(createdRepo.DefaultBranch); err != nil {
-			fmt.Printf("Error auto pushing repo to Github: %v\n", err)
-			return err
+			return fmt.Errorf("Error auto pushing repository to Github: %v\n\n", err)
 		}
 	}
 
@@ -125,11 +122,24 @@ func getDirectoryName() (string, error) {
 }
 
 func autoPushInitialCommit(defaultBranch string) error {
-	cmd := exec.Command("git", "commit", "-am", "initial commit")
-	output, err := cmd.CombinedOutput()
+	addCmd := exec.Command("git", "add", ".")
+	addOutput, err := addCmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("Error on git commit: %v\nOutput: %v\n", err, string(output))
+		return fmt.Errorf("Error on git add command: %v\nOutput: %v\n", err, string(addOutput))
 	}
+
+	commitCmd := exec.Command("git", "commit", "-m", "initial commit")
+	commitOutput, err := commitCmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("Error on git commmit command: %v\nOutput: %v\n", err, string(commitOutput))
+	}
+
+	branch := exec.Command("git", "branch", "-M", defaultBranch)
+	branchOutput, err := branch.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("Error creating %s branch: %v\nOutput: %v\n", defaultBranch, err, string(branchOutput))
+	}
+
 	pushCmd := exec.Command("git", "push", "-u", "origin", defaultBranch)
 	pushOutput, err := pushCmd.CombinedOutput()
 	if err != nil {
@@ -146,21 +156,20 @@ func createReadmeFile(repoName string) error {
 
 func createGitignoreFile() error {
 	content := `
-	### BINARIES ###
-	*.exe
-	*.dll
-	*.so	
-	*.dylib
-	*.test
+### BINARIES ###
+*.exe
+*.dll
+*.so	
+*.dylib
+*.test
 	
-	### DOTENV ###
-	*.env
+### DOTENV ###
+*.env
 
-	### IDE / Editor configs ###
-	.vscode/
-	.idea/
-	*.swp
-	`
+### IDE / Editor configs ###
+.vscode/
+.idea/
+*.swp`
 
 	return os.WriteFile(".gitignore", []byte(content), 0644)
 }
