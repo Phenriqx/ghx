@@ -18,9 +18,10 @@ type Contributors struct {
 }
 
 type CreateRepoRequest struct {
-	Name        string `json:"name"`
-	Private     bool   `json:"private"`
-	Description string `json:"description"`
+	Name          string `json:"name"`
+	Private       bool   `json:"private"`
+	Description   string `json:"description"`
+	DefaultBranch string `json:"default_branch"`
 }
 
 type UserActivity struct {
@@ -37,4 +38,3 @@ type UserActivity struct {
 type GithubUser struct {
 	Login string `json:"login"`
 }
-
