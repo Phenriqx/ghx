@@ -8,8 +8,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func HandleCreateRepo(repoName string, private bool, description string) {
-	github_token, _ := helpers.GetGithubToken()
+func HandleCreateRepo(repoName, description string, private bool) (*resty.Response, helpers.CreateRepoRequest, error) {
+	github_token, err := helpers.GetGithubToken()
+	if err != nil || github_token == "" {
+		return nil, helpers.CreateRepoRequest{}, fmt.Errorf("Error fetching Github Token: %v", err)
+	}
 	var createdRepo helpers.CreateRepoRequest
 	payload := helpers.CreateRepoRequest{
 		Name:        repoName,
@@ -25,9 +28,26 @@ func HandleCreateRepo(repoName string, private bool, description string) {
 		Post("https://api.github.com/user/repos")
 	if err != nil {
 		fmt.Println("Error creating repository: ", err)
-		return
+		return nil, helpers.CreateRepoRequest{}, err
+	}
+	if response.StatusCode() >= 400 {
+		if response.StatusCode() == 422 {
+			return response, createdRepo, fmt.Errorf("Repository %s already exists.", createdRepo.Name)
+		} else {
+			fmt.Printf("Error. Status Code: %v", response.StatusCode())
+			return response, helpers.CreateRepoRequest{}, fmt.Errorf("Github API Error: %v", response.String())
+		}
 	}
 
+	return response, createdRepo, nil
+}
+
+func handleCreatePostRequest(repoName, desc string, private bool) {
+	response, createdRepo, err := HandleCreateRepo(repoName, desc, private)
+	if err != nil {
+		fmt.Println("Error handling POST Request: ", err)
+		return
+	}
 	fmt.Printf("✅ Created repository \033[31m%s\033[0m\n\n", response.Status())
 	fmt.Println("Repository: ", createdRepo.Name)
 	fmt.Println("Private: ", createdRepo.Private)
@@ -48,7 +68,7 @@ var createCmd = &cobra.Command{
 		repoName := args[0]
 		private, _ := cmd.Flags().GetBool("private")    // Get the value of the --private flag
 		description, _ := cmd.Flags().GetString("desc") // Get the value of the --desc flag
-		HandleCreateRepo(repoName, private, description)
+		handleCreatePostRequest(repoName, description, private)
 	},
 }
 
