@@ -59,7 +59,7 @@ var createCmd = &cobra.Command{
 	Use:   "create <repo-name>",
 	Short: "Creates a new repository on Github",
 	Long: `Create a new Github Repository with the following syntax: 
-			github-cli create {repo-name} 
+			ghx create {repo-name} 
 			--private {include this if you want a private repo, otherwise don't} - optional. 
 			--desc "provide repo description" - optional.`,
 	Args: cobra.ExactArgs(1),

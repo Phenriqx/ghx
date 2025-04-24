@@ -43,7 +43,7 @@ var listCmd = &cobra.Command{
 	Use:   "list <username>",
 	Short: "List all the user repositories",
 	Long: `List all the repositories from the user. How to use:
-			github-cli {username}`,
+			ghx {username}`,
 	Args: cobra.ExactArgs(1),
 
 	Run: func(cmd *cobra.Command, args []string) {

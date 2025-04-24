@@ -19,7 +19,7 @@ var initCmd = &cobra.Command{
 	Short: "Set up the Git/Github environment automatically.",
 	Long: `Set up the Git/Github environment automatically for you. 
 It initializes a local repository, creates a Github repository with the current folder's name if none are provided and also sets up HTTPS as the Remote Origin if you don't opt for SSH.
-How to use: github-cli init 
+How to use: ghx init 
 		--name "enter a name for your repo" (optional).
 		--private - creates a private repo (optional).
 		--ssh - defines the remote origin as SSH (optional).
@@ -45,11 +45,17 @@ How to use: github-cli init
 			fmt.Println("Error getting the --desc flag: ", err)
 			return
 		}
-		HandleInitCommand(private, ssh, name, desc)
+
+		gitignore, err := cmd.Flags().GetBool("gitignore")
+		if err != nil {
+			fmt.Println("Error getting the --gitignore flag: ", err)
+			return
+		}
+		HandleInitCommand(private, ssh, gitignore, name, desc)
 	},
 }
 
-func HandleInitCommand(private, ssh bool, name, desc string) {
+func HandleInitCommand(private, ssh, gitignore bool, name, desc string) {
 	fmt.Printf("Setting up environment...\n\n")
 
 	githubToken, err := helpers.GetGithubToken()
@@ -84,6 +90,13 @@ func HandleInitCommand(private, ssh bool, name, desc string) {
 		remoteOrigin = fmt.Sprintf("https://github.com/%s/%s.git", username, createdRepo.Name)
 	}
 
+	if gitignore {
+		if err := createGitignoreFile(); err != nil {
+			fmt.Printf("Error creating .gitignore file: %v", err)
+			return
+		}
+	}
+
 	addOrigin := exec.Command("git", "remote", "add", "origin", remoteOrigin)
 	originOutput, err := addOrigin.CombinedOutput()
 	if err != nil {
@@ -105,6 +118,27 @@ func getDirectoryName() (string, error) {
 	return filepath.Base(path), nil
 }
 
+func createGitignoreFile() error {
+	content := `
+	### BINARIES ###
+	*.exe
+	*.dll
+	*.so	
+	*.dylib
+	*.test
+	
+	### DOTENV ###
+	*.env
+
+	### IDE / Editor configs ###
+	.vscode/
+	.idea/
+	*.swp
+	`
+
+	return os.WriteFile(".gitignore", []byte(content), 0644)
+}
+
 func init() {
 	folderName, err := getDirectoryName()
 	if err != nil {
@@ -116,6 +150,7 @@ func init() {
 	initCmd.PersistentFlags().BoolP("ssh", "s", false, "Define SSH as Remote URL, Default is HTTPS.")
 	initCmd.PersistentFlags().StringP("name", "n", folderName, "Define the repository's name.")
 	initCmd.PersistentFlags().StringP("desc", "d", "", "Define repository's description.")
+	initCmd.PersistentFlags().Bool("gitignore", false, "Initializes your repository already with a .gitignore file.")
 	rootCmd.AddCommand(initCmd)
 
 	// Here you will define your flags and configuration settings.

@@ -11,12 +11,12 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "github-cli {command}",
+	Use:   "ghx {command}",
 	Short: "Command Line Interface that allows the user to perform Github functionalities on the terminal.",
 	Long: `This CLI allows the user to perform Github operations on the terminal without needing to visit the Github Website for anything.
 Some actions include: create and delete repositories, get a certain user recent activitity, search repos, etc.
-Example: github-cli create testing-application --private --desc "Testing my Github CLI!
-This command creates a private repo with the given description on your Github account faster than you would using the website."`,
+Example: ghx create testing-application --private --desc "Testing my Github CLI!"
+This command creates a private repo with the given description on your Github account faster than you would using the website.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

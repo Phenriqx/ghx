@@ -47,7 +47,7 @@ var searchCmd = &cobra.Command{
 	Use:   "search <repository>",
 	Short: "Search for a repository on Github",
 	Long: `Search for a repository on Github. 
-		github-cli search {name of the repo}`,
+		ghx search {name of the repo}`,
 	Args: cobra.ExactArgs(1),
 
 	Run: func(cmd *cobra.Command, args []string) {

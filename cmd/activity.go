@@ -49,7 +49,7 @@ var activityCmd = &cobra.Command{
 	Use:   "activity <username>",
 	Short: "Get activity information from a certain user.",
 	Long: `Get recent activity from a certain user with the following syntax:
-			github-cli activity {username}
+			ghx activity {username}
 			--number {define how many activities from the user you want to return} - optional`,
 	Args: cobra.ExactArgs(1),
 
