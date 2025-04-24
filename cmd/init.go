@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 
 	"github.com/phenriqx/github-cli/cmd/helpers"
 	"github.com/spf13/cobra"
@@ -45,6 +44,8 @@ var initCmd = &cobra.Command{
 }
 
 func HandleInitCommand(private, ssh bool, name, desc string) {
+	fmt.Printf("Setting up environment...\n\n")
+
 	githubToken, err := helpers.GetGithubToken()
 	if err != nil {
 		fmt.Printf("Error fetching Github Token: %v\n", err)
@@ -63,8 +64,6 @@ func HandleInitCommand(private, ssh bool, name, desc string) {
 		fmt.Printf("Error running git init: %v\nOutput: %s\n", err, string(output))
 		return
 	}
-
-	fmt.Println(string(output))
 
 	response, createdRepo, err := HandleCreateRepo(name, desc, private)
 	if err != nil {
@@ -86,18 +85,18 @@ func HandleInitCommand(private, ssh bool, name, desc string) {
 		return
 	}
 
-	fmt.Println(string(originOutput))
+	fmt.Printf("Created repository: \033[31m%s\033[0m\n", response.Status())
+	fmt.Println("Repository:", createdRepo.Name)
+	fmt.Printf("Remote Origin: %v\n", remoteOrigin)
 }
 
 func getDirectoryName() (string, error) {
-	_, filename, _, ok := runtime.Caller(0)
-	if !ok {
-		fmt.Println("Error getting current directory name")
-		os.Exit(1)
+	path, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("Error getting current directory name: %v\n", err)
+		return "", err
 	}
-	dirname := filepath.Dir(filename)
-	name := filepath.Base(dirname)
-	return name, nil
+	return filepath.Base(path), nil
 }
 
 func init() {

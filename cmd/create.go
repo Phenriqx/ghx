@@ -31,8 +31,12 @@ func HandleCreateRepo(repoName, description string, private bool) (*resty.Respon
 		return nil, helpers.CreateRepoRequest{}, err
 	}
 	if response.StatusCode() >= 400 {
-		fmt.Printf("Error. Status Code: %v", response.StatusCode())
-		return response, helpers.CreateRepoRequest{}, fmt.Errorf("Github API Error: %v", response.String())
+		if response.StatusCode() == 422 {
+			return response, createdRepo, fmt.Errorf("Repository %s already exists.", createdRepo.Name)
+		} else {
+			fmt.Printf("Error. Status Code: %v", response.StatusCode())
+			return response, helpers.CreateRepoRequest{}, fmt.Errorf("Github API Error: %v", response.String())
+		}
 	}
 
 	return response, createdRepo, nil
