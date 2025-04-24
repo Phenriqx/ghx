@@ -16,8 +16,14 @@ import (
 // initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "",
-	Long:  ``,
+	Short: "Set up the Git/Github environment automatically.",
+	Long: `Set up the Git/Github environment automatically for you. 
+It initializes a local repository, creates a Github repository with the current folder's name if none are provided and also sets up HTTPS as the Remote Origin if you don't opt for SSH.
+How to use: github-cli init 
+		--name "enter a name for your repo" (optional).
+		--private - creates a private repo (optional).
+		--ssh - defines the remote origin as SSH (optional).
+		--desc "provide a description for your repo" (optional)`,
 	Run: func(cmd *cobra.Command, args []string) {
 		private, err := cmd.Flags().GetBool("private")
 		if err != nil {
