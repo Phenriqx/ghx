@@ -18,19 +18,19 @@ Make sure you have Go installed on your system. Then, clone the repository and b
 
 ```
 # Clone the repository
-git clone https://github.com/yourusername/github-cli.git
-cd github-cli
+git clone https://github.com/yourusername/ghx.git
+cd ghx
 
 # Build the binary
-go build -o github-tool .
+go build -o ghx .
 
 # Move to a directory in your PATH (optional)
-sudo mv github-tool /usr/local/bin/ (linux/macOS)
+sudo mv ghx /usr/local/bin/ (linux/macOS)
 ```
 After that, you need to make your compiled binary executable by running chmod:
 
 ```
-chmod +x /usr/local/bin/github-tool
+chmod +x /usr/local/bin/ghx
 ```
 
 ## 🔑 Configuration
@@ -49,17 +49,17 @@ echo "GITHUB_TOKEN=your_actual_token_here" > .env
 Run the CLI tool with the available commands:
 
 ```
-github-tool --help
+ghx --help
 ```
 ### 📖 Example Commands
 ```
-github-tool list
+ghx list
 ```
 ```
-github-tool create <repo-name> --private (optional) --desc "" (optional)
+ghx create <repo-name> --private (optional) --desc "" (optional)
 ```
 ```
-github-tool delete <repo-name>
+ghx delete <repo-name>
 ```
 
 
