@@ -20,12 +20,9 @@ var branchCmd = &cobra.Command{
 var createBranchCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a new branch",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		name, err := cmd.Flags().GetString("name")
-		if err != nil {
-			fmt.Printf("Error getting --name flag: %v\n", err)
-			return
-		}
+		name := args[0]
 		if err := CreateBranch(name); err != nil {
 			fmt.Printf("Error creating branch: %v\n", err)
 		}
@@ -35,12 +32,9 @@ var createBranchCmd = &cobra.Command{
 var deleteBranchCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete a branch",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		name, err := cmd.Flags().GetString("name")
-		if err != nil {
-			fmt.Printf("Error getting --name flag: %v\n", err)
-			return
-		}
+		name := args[0]
 		if err := DeleteBranch(name); err != nil {
 			fmt.Printf("Error deleting branch: %v\n", err)
 			return
@@ -51,12 +45,9 @@ var deleteBranchCmd = &cobra.Command{
 var switchBranchCmd = &cobra.Command{
 	Use:   "switch",
 	Short: "Switch branches",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		name, err := cmd.Flags().GetString("name")
-		if err != nil {
-			fmt.Printf("Error getting --name flag: %v\n", err)
-			return
-		}
+		name := args[0]
 		if err := SwitchBranch(name); err != nil {
 			fmt.Printf("Error switching to branch %s.\n", name)
 			return
@@ -98,10 +89,6 @@ func SwitchBranch(name string) error {
 }
 
 func init() {
-	createBranchCmd.PersistentFlags().StringP("name", "n", "", "Name of the new branch")
-	deleteBranchCmd.PersistentFlags().StringP("name", "n", "", "Name of the branch to delete")
-	switchBranchCmd.PersistentFlags().StringP("name", "n", "", "Name of the branch to switch to")
-
 	// Attach subcommands to branch
 	branchCmd.AddCommand(createBranchCmd)
 	branchCmd.AddCommand(deleteBranchCmd)
