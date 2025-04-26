@@ -107,8 +107,24 @@ var prMergeCmd = &cobra.Command{
 var prCloseCmd = &cobra.Command{
 	Use:   "close",
 	Short: "Close a pull request",
+	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := closePullRequest(); err != nil {
+		if len(args) == 0 {
+			fmt.Printf("Missing PR number argument.\n")
+			return
+		}
+
+		prNumber, err := strconv.Atoi(args[0])
+		if err != nil {
+			fmt.Printf("Error parsing PR number: %v\n", err)
+			return
+		}
+		if prNumber == 0 {
+			fmt.Printf("Invalid PR number. Please enter a valid number.")
+			return
+		}
+
+		if err := closePullRequest(prNumber); err != nil {
 			fmt.Printf("Error closing pull request: %v\n", err)
 			return
 		}
