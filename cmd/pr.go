@@ -18,6 +18,7 @@ import (
 var prCmd = &cobra.Command{
 	Use:   "pr",
 	Short: "Manage Pull Requests",
+	Long:  "With this command you can: open new PRs, merge, close and list all open PRs on your active repository.",
 }
 
 var prListCmd = &cobra.Command{
@@ -49,11 +50,6 @@ var prListCmd = &cobra.Command{
 		for _, pr := range prs {
 			fmt.Printf("#%d %s (%s)\n", *pr.Number, *pr.Title, *pr.State)
 			fmt.Printf("Is meargeable: %v\n", *pr.Mergeable)
-			if pr.GetMerged() {
-				fmt.Printf("Merged By %v at %v\n", *pr.MergedBy, *pr.MergedAt)
-			} else {
-				fmt.Printf("PR not merged yet.")
-			}
 		}
 	},
 }
@@ -66,7 +62,8 @@ var (
 
 var prCreateCmd = &cobra.Command{
 	Use:   "new",
-	Short: "Open a new Pull Requests",
+	Short: "Open a new Pull Request",
+	Long:  "Create a new pull request on your active repository. You must specify a name and the name of the branch you want to merge with using the --head flag.",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		prTitle := args[0]
@@ -102,6 +99,17 @@ var prMergeCmd = &cobra.Command{
 
 		if err := mergePullRequest(parsed); err != nil {
 			fmt.Printf("Error deleting pull request: %v\n", err)
+			return
+		}
+	},
+}
+
+var prCloseCmd = &cobra.Command{
+	Use:   "close",
+	Short: "Close a pull request",
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := closePullRequest(); err != nil {
+			fmt.Printf("Error closing pull request: %v\n", err)
 			return
 		}
 	},
@@ -169,6 +177,31 @@ func mergePullRequest(prNumber int) error {
 	return nil
 }
 
+func closePullRequest(prNumber int) error {
+	token, err := helpers.GetGithubToken()
+	if err != nil {
+		return fmt.Errorf("Error getting Github Token: %v\n", err)
+	}
+	client := getGithubClient(token)
+	owner, repoName, err := helpers.GetRepoInfo()
+	if err != nil {
+		return fmt.Errorf("Error getting repository's information: %v\n", err)
+	}
+	var state string = "closed"
+	update := &github.PullRequest{
+		State: &state,
+	}
+
+	pr, response, err := client.PullRequests.Edit(context.Background(), owner, repoName, prNumber, update)
+	if err != nil {
+		return fmt.Errorf("Error closing pull request %d: %v\nStatus Code: %v\n", prNumber, err, response.Status)
+	}
+
+	fmt.Printf("Pull Request %d closed successfully.\n", prNumber)
+	fmt.Printf("Closed at: %d\n", pr.GetClosedAt())
+	return nil
+}
+
 func getGithubClient(token string) *github.Client {
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(
@@ -189,6 +222,8 @@ func init() {
 	prMergeCmd.PersistentFlags().StringVar(&prMessage, "message", "", "Enter a message for your PR.")
 
 	prCreateCmd.MarkFlagRequired("head")
+	prCmd.AddCommand(prMergeCmd)
+	prCmd.AddCommand(prListCmd)
 	prCmd.AddCommand(prCreateCmd)
 	rootCmd.AddCommand(prCmd)
 }
