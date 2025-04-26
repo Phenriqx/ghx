@@ -224,8 +224,8 @@ func init() {
 	initCmd.PersistentFlags().BoolP("ssh", "s", false, "Define SSH as Remote URL, Default is HTTPS.")
 	initCmd.PersistentFlags().StringP("name", "n", folderName, "Define the repository's name.")
 	initCmd.PersistentFlags().StringP("desc", "d", "", "Define repository's description.")
-	initCmd.PersistentFlags().Bool("gitignore", false, "Initializes your repository already with a .gitignore file.")
-	initCmd.PersistentFlags().Bool("readme", false, "Initializes your repository with a README.md file.")
+	initCmd.PersistentFlags().BoolP("gitignore", "g", false, "Initializes your repository already with a .gitignore file.")
+	initCmd.PersistentFlags().BoolP("readme", "r", false, "Initializes your repository with a README.md file.")
 	initCmd.PersistentFlags().Bool("push", false, "Auto push after initializing repo.")
 	rootCmd.AddCommand(initCmd)
 }

@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
@@ -94,4 +96,36 @@ func GetGithubUsername(token string) (string, error) {
 	}
 
 	return user.Login, nil
+}
+
+func GetRepoInfo() (string, string, error) {
+	cmd := exec.Command("git", "remote", "get-url", "origin")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", "", fmt.Errorf("Error getting the remote URL from this repository: %v\nOutput: %v\n", err, string(output))
+	}
+
+	url := strings.TrimSpace(string(output))
+
+	// Handles both HTTPS and SSH URLs
+	if strings.HasPrefix(url, "git@") {
+		// SSH URL
+		parts := strings.Split(url, ":")
+		if len(parts) < 2 {
+			return "", "", fmt.Errorf("Unexpected URL format. Please check your origin.")
+		}
+		url = parts[1]
+	} else if strings.HasPrefix(url, "https://") {
+		// HTTPS URL
+		url = strings.TrimPrefix(url, "https://github.com/")
+	}
+
+	url = strings.TrimSuffix(url, ".git")
+	split := strings.Split(url, "/")
+
+	if len(split) != 2 {
+		return "", "", fmt.Errorf("Invalid URL format: %v\n", url)
+	}
+
+	return split[0], split[1], nil
 }
