@@ -2,15 +2,34 @@
 A command-line interface (CLI) tool built with Golang to interact with GitHub repositories efficiently. This tool leverages Cobra for command handling and Resty for making API requests.
 
 
-## 🚀 Features 
-
+## 🚀 Features
 <ul>
-  <li>List user repositories</li>
-  <li>Fetch repository details</li>
-  <li>Create new repositories</li>
-  <li>Clone repositories</li>
-  <li>Delete repositories</li>
+  
+- 🔧 **Initialize Repositories**  
+  Automatically create a GitHub repository, set remote origin, and optionally add README, .gitignore, and push.
+  
+- 📜 **List Repositories**  
+  View all your GitHub repositories in a clean list.
+  
+- 📦 **Create New Repositories**  
+  Quickly create public or private repos with optional descriptions.
+
+- 🧹 **Delete Repositories**  
+  Permanently delete repositories with confirmation.
+
+- 🔍 **Repository Info**  
+  Fetch metadata and details for a given repository.
+
+- 🧲 **Clone Repositories**  
+  Clone repos using HTTPS or SSH.
+
+- 🔁 **Manage Pull Requests**  
+  Create, list, merge, and close PRs with ease.
+
+- 🎮 **Interactive Mode (coming soon)**  
+  Use `ghx init` with no arguments to launch an interactive setup wizard.
 </ul>
+
 
 
 ## 🛠 Installation 
